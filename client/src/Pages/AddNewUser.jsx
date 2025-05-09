@@ -12,6 +12,7 @@ import AdminLayout from "../Layouts/AdminLayout";
 import axios from "axios";
 import dayjs from "dayjs";
 import { use } from "react";
+import { useNavigate } from "react-router-dom";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const { Option } = Select;
@@ -20,6 +21,7 @@ const AddNewUser = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [managers, setManagers] = useState([]);
+  const navigate = useNavigate();
 
   const fetchManagers = async () => {
     setLoading(true);
@@ -55,6 +57,7 @@ const AddNewUser = () => {
 
       message.success(res.data.message || "Registration success.");
       form.resetFields();
+      navigate("/admindash");
     } catch (err) {
       console.error(err);
       message.error(err.response?.data?.message || "Something went wrong.");

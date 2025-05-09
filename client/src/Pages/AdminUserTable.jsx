@@ -144,6 +144,24 @@ const AdminUserTable = ({ allusers }) => {
       ),
     },
     {
+      title: "Password",
+      dataIndex: "password",
+      render: (password) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>{password}</span>
+          <Tooltip title="Copy Password">
+            <CopyOutlined
+              onClick={() => {
+                navigator.clipboard.writeText(password);
+                message.success("Password copied!");
+              }}
+              style={{ cursor: "pointer", color: "#1890ff" }}
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+    {
       title: "Date (AMAZON)",
       dataIndex: "dateAmazon",
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
@@ -155,6 +173,15 @@ const AdminUserTable = ({ allusers }) => {
     {
       title: "Date (WEBSITE)",
       dataIndex: "dateWebsite",
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
+    },
+    {
+      title: "E. ID ETSY",
+      dataIndex: "enrollmentIdEtsy",
+    },
+    {
+      title: "Date (ETSY)",
+      dataIndex: "dateEtsy",
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
@@ -206,24 +233,7 @@ const AdminUserTable = ({ allusers }) => {
         return masked;
       },
     },
-    {
-      title: "Password",
-      dataIndex: "password",
-      render: (password) => (
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span>{password}</span>
-          <Tooltip title="Copy Password">
-            <CopyOutlined
-              onClick={() => {
-                navigator.clipboard.writeText(password);
-                message.success("Password copied!");
-              }}
-              style={{ cursor: "pointer", color: "#1890ff" }}
-            />
-          </Tooltip>
-        </div>
-      ),
-    },
+
     {
       title: "AZ Manager",
       dataIndex: "amazonManager",
