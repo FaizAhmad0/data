@@ -36,7 +36,6 @@ const AdminUserTable = ({ allusers }) => {
     } catch (error) {
       console.error("Error fetching managers:", error);
       message.error("Failed to fetch managers");
-    } finally {
     }
   };
 
@@ -69,6 +68,16 @@ const AdminUserTable = ({ allusers }) => {
           (user) => user.enrollmentIdAmazon && user.enrollmentIdEtsy
         );
         break;
+      case "amazon_only":
+        filtered = allusers.filter(
+          (user) => user.enrollmentIdAmazon && !user.enrollmentIdWebsite
+        );
+        break;
+      case "website_only":
+        filtered = allusers.filter(
+          (user) => user.enrollmentIdWebsite && !user.enrollmentIdAmazon
+        );
+        break;
       default:
         filtered = allusers;
     }
@@ -85,12 +94,16 @@ const AdminUserTable = ({ allusers }) => {
   const amazonEtsyCount = allusers.filter(
     (u) => u.enrollmentIdAmazon && u.enrollmentIdEtsy
   ).length;
+  const amazonOnlyCount = allusers.filter(
+    (u) => u.enrollmentIdAmazon && !u.enrollmentIdWebsite
+  ).length;
+  const websiteOnlyCount = allusers.filter(
+    (u) => u.enrollmentIdWebsite && !u.enrollmentIdAmazon
+  ).length;
 
   const handleDelete = async (userId) => {
     try {
-      await axios.delete(
-        `${process.env.REACT_APP_BACKEND_URL}/admin/delete-user/${userId}`
-      );
+      await axios.delete(`${backendUrl}/admin/delete-user/${userId}`);
       message.success("User deleted successfully");
       window.location.reload();
     } catch (err) {
@@ -105,7 +118,7 @@ const AdminUserTable = ({ allusers }) => {
 
     try {
       await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/admin/assign-manager/${selectedUser._id}`,
+        `${backendUrl}/admin/assign-manager/${selectedUser._id}`,
         {
           type: managerType,
           name: managerName,
@@ -134,7 +147,6 @@ const AdminUserTable = ({ allusers }) => {
             <CopyOutlined
               onClick={() => {
                 navigator.clipboard.writeText(`UID${uid}`);
-                // Optional: AntD message or notification
                 message.success("Copied UID to clipboard!");
               }}
               style={{ cursor: "pointer", color: "#1890ff" }}
@@ -193,6 +205,10 @@ const AdminUserTable = ({ allusers }) => {
       dataIndex: "batchWebsite",
     },
     {
+      title: "Batch (ETSY)",
+      dataIndex: "batchEtsy",
+    },
+    {
       title: "Batch (AMAZON)",
       dataIndex: "batchAmazon",
     },
@@ -209,8 +225,6 @@ const AdminUserTable = ({ allusers }) => {
         if (role === "admin") {
           return text;
         }
-
-        // Masked email logic
         const [username, domain] = text.split("@");
         const maskedUsername =
           username.slice(0, 2) + "*".repeat(Math.max(0, username.length - 2));
@@ -225,15 +239,12 @@ const AdminUserTable = ({ allusers }) => {
         if (role === "admin") {
           return text;
         }
-
-        // Mask all but last 2 digits
         const visibleDigits = 2;
         const masked =
           "*".repeat(text.length - visibleDigits) + text.slice(-visibleDigits);
         return masked;
       },
     },
-
     {
       title: "AZ Manager",
       dataIndex: "amazonManager",
@@ -258,7 +269,6 @@ const AdminUserTable = ({ allusers }) => {
           >
             Assign M..
           </Button>
-
           <Popconfirm
             title="Are you sure to delete this user?"
             onConfirm={() => handleDelete(user._id)}
@@ -328,6 +338,18 @@ const AdminUserTable = ({ allusers }) => {
             >
               Amazon & Etsy ({amazonEtsyCount})
             </Button>
+            <Button
+              type={activeFilter === "amazon_only" ? "primary" : "default"}
+              onClick={() => handleFilter("amazon_only")}
+            >
+              Amazon Only ({amazonOnlyCount})
+            </Button>
+            <Button
+              type={activeFilter === "website_only" ? "primary" : "default"}
+              onClick={() => handleFilter("website_only")}
+            >
+              Website Only ({websiteOnlyCount})
+            </Button>
           </Button.Group>
         </div>
 
@@ -335,7 +357,7 @@ const AdminUserTable = ({ allusers }) => {
           <h2 className="text-sm sm:text-base font-semibold">
             Total users: {filteredUsers.length}
           </h2>
-          {localStorage.getItem("role") === "admin" ? (
+          {localStorage.getItem("role") === "admin" && (
             <CSVLink
               data={filteredUsers}
               headers={csvHeaders}
@@ -343,8 +365,6 @@ const AdminUserTable = ({ allusers }) => {
             >
               <Button type="primary">Export CSV</Button>
             </CSVLink>
-          ) : (
-            <></>
           )}
         </div>
       </div>
