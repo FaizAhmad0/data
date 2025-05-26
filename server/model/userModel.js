@@ -34,6 +34,7 @@ const userSchema = new Schema(
     batchAmazon: { type: String },
     batchWebsite: { type: String },
     batchEtsy: { type: String },
+    enrolledBy: { type: String },
   },
   { timestamps: true }
 );

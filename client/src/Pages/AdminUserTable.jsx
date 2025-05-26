@@ -258,6 +258,10 @@ const AdminUserTable = ({ allusers }) => {
       dataIndex: "etsyManager",
     },
     {
+      title: "Enrolled By",
+      dataIndex: "enrolledBy",
+    },
+    {
       title: "Action",
       render: (_, user) => (
         <div className="flex gap-2 items-center">

@@ -9,6 +9,8 @@ import {
   CalendarOutlined,
 } from "@ant-design/icons";
 import AdminLayout from "../Layouts/AdminLayout";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import axios from "axios";
 import dayjs from "dayjs";
 import { use } from "react";
@@ -38,6 +40,10 @@ const AddNewUser = () => {
 
   useEffect(() => {
     fetchManagers();
+    AOS.init({
+      duration: 1000, // animation duration
+      once: true, // whether animation should happen only once
+    });
   }, []);
 
   const onFinish = async (values) => {
@@ -68,7 +74,10 @@ const AddNewUser = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f3f4f6] p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div
+        data-aos="fade-up"
+        className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+      >
         <div className="flex justify-center mb-6">
           <img src="/logo.png" alt="Logo" className="h-16" />
         </div>
@@ -147,6 +156,16 @@ const AddNewUser = () => {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="enrolledBy"
+            rules={[{ message: "Please enter enrolled name" }]}
+          >
+            <Input
+              placeholder="Enter enrolled name"
+              prefix={<UserOutlined />}
+            />
           </Form.Item>
 
           <Form.Item>

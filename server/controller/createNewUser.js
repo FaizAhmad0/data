@@ -2,8 +2,16 @@ const User = require("../model/userModel");
 
 module.exports = async (req, res) => {
   try {
-    const { name, email, enrollment, primaryContact, date, batch, manager } =
-      req.body;
+    const {
+      name,
+      email,
+      enrollment,
+      primaryContact,
+      date,
+      batch,
+      manager,
+      enrolledBy,
+    } = req.body;
 
     // Basic validation
     if (
@@ -79,6 +87,7 @@ module.exports = async (req, res) => {
       email,
       primaryContact,
       password,
+      enrolledBy,
     };
 
     if (enrollment.startsWith("AZ")) {

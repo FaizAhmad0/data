@@ -17,8 +17,16 @@ module.exports = async (req, res) => {
     const skippedUsers = [];
 
     for (const user of usersData) {
-      const { name, email, enrollment, primaryContact, date, batch, manager } =
-        user;
+      const {
+        name,
+        email,
+        enrollment,
+        primaryContact,
+        date,
+        batch,
+        manager,
+        enrolledBy,
+      } = user;
 
       if (
         !name ||
@@ -95,6 +103,7 @@ module.exports = async (req, res) => {
         email,
         primaryContact,
         password,
+        enrolledBy,
       };
 
       if (enrollmentPrefix === "AZ") {
