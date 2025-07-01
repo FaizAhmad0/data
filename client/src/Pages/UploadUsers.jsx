@@ -54,11 +54,35 @@ const UploadUsers = () => {
           `${backendUrl}/admin/bulk-upload`,
           formattedData
         );
-        message.success("Excel data uploaded successfully!");
-        console.log("Server response:", response.data);
+        const {
+          message: successMessage,
+          created,
+          updated,
+          skipped,
+          skippedUsers,
+        } = response.data;
+
+        if (skipped > 0 && skippedUsers?.length) {
+          const reasons = skippedUsers
+            .map(
+              (user, index) =>
+                `${index + 1}. ${user.primaryContact}: ${user.reason}`
+            )
+            .join("\n");
+
+          message.warning(
+            `Skipped ${skipped} users:\n${reasons}`
+          );
+        } else {
+          message.success(
+            successMessage || "Excel data uploaded successfully."
+          );
+        }
+
+        console.log(response.data);
       } catch (error) {
         console.error("Upload failed:", error);
-        message.error("Failed to upload Excel data.");
+        message.error(error?.response?.data?.message || error.message);
       }
     };
     reader.readAsArrayBuffer(file);
