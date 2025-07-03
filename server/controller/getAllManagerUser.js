@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
       ],
     });
 
-    console.log(allUsers);
+    // console.log(allUsers);
 
     res.status(200).json({
       message: "Users fetched successfully.",

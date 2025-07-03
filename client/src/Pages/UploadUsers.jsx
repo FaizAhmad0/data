@@ -79,7 +79,6 @@ const UploadUsers = () => {
           );
         }
 
-        console.log(response.data);
       } catch (error) {
         console.error("Upload failed:", error);
         message.error(error?.response?.data?.message || error.message);
@@ -114,7 +113,6 @@ const UploadUsers = () => {
               formattedData
             );
             message.success("CSV data uploaded successfully!");
-            console.log("Server response:", response.data);
           } catch (error) {
             console.error("Upload failed:", error);
             message.error("Failed to upload CSV data.");

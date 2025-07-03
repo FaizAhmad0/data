@@ -8,17 +8,20 @@ import SupervisorDash from "./Pages/SupervisorDash";
 import ManagerPrivateRoute from "./Components/ManagerPrivateRoute";
 import AdminPrivateRoute from "./Components/AdminPrivateRoute";
 import SupPrivateRoute from "./Components/SupPrivateRoute";
-    import AllManagers from "./Pages/AllManagers";
+import AllManagers from "./Pages/AllManagers";
 import AddNewUser from "./Pages/AddNewUser";
 import AllSupervisor from "./Pages/AllSupervisor";
+import LoginForm from "./Pages/LoginForm";
+import AccountantDash from "./Pages/AccountantDash";
+import AccountantPrivateRoute from "./Components/AccountantPrivateRoute";
 
 function App() {
   return (
     <>
       <Router>
         <Routes>
-          <Route path="/" exact element={<LogIn />} />
-          <Route path="/login" exact element={<LogIn />} />
+          <Route path="/" exact element={<LoginForm />} />
+          <Route path="/login" exact element={<LoginForm />} />
 
           {/* Manager Routes */}
           <Route element={<ManagerPrivateRoute />}>
@@ -37,6 +40,9 @@ function App() {
           <Route element={<SupPrivateRoute />}>
             <Route path="/supervisordash" element={<SupervisorDash />} />
             <Route path="/addnew" element={<AddNewUser />} />
+          </Route>
+          <Route element={<AccountantPrivateRoute />}>
+            <Route path="/accountantdash" element={<AccountantDash />} />
           </Route>
         </Routes>
       </Router>

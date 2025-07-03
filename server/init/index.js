@@ -18,21 +18,26 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const findUsersByBatch = async () => {
+const updateManagerToAccountant = async () => {
   try {
-    // Query the database to find users by batch
-    const users = await User.findOne({ role: "admin" }); // Assumes `batch` is a field in the User model
-    console.log(users);
-    users.password = "SSR@15@2002";
-    await users.save();
+    const user = await User.find({
+      uid: 28,
+    });
+    if (!user) {
+      console.log("Manager with the given email not found.");
+      return;
+    }
+
+    user.role = "accountant";
+    await user.save();
+    console.log("Role updated to accountant for:", user.email);
   } catch (error) {
-    console.error("Error finding users:", error);
-    return [];
+    console.error("Error updating role:", error);
   }
 };
 
-// Call the function with the batch value
-findUsersByBatch();
+// Call the function
+updateManagerToAccountant();
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

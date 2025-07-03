@@ -11,7 +11,7 @@ const userSchema = new Schema(
     password: { type: String },
     role: {
       type: String,
-      enum: ["user", "manager", "admin", "supervisor"],
+      enum: ["user", "manager", "admin", "supervisor", "accountant"],
       required: true,
       default: "user",
     },
@@ -35,6 +35,14 @@ const userSchema = new Schema(
     batchWebsite: { type: String },
     batchEtsy: { type: String },
     enrolledBy: { type: String },
+    gstLink: {
+      type: String,
+      default: "",
+    },
+    legalityLink: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

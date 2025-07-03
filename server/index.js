@@ -7,6 +7,7 @@ const loginRoute = require("./route/LoginRoute");
 const userRoute = require("./route/userRoute");
 const managerRoute = require("./route/managerRoute");
 const adminRoute = require("./route/adminRoute");
+const accountant = require("./route/AccountantRoute");
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/login", loginRoute);
 app.use("/user", userRoute);
 app.use("/manager", managerRoute);
 app.use("/admin", adminRoute);
+app.use("/accountant",accountant);
 
 mongoose
   .connect(process.env.MONGO_URI)
