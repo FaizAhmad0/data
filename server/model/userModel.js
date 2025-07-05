@@ -43,6 +43,22 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    azdt: {
+      type: Boolean,
+      default: false,
+    },
+    azsf: {
+      type: Boolean,
+      default: false,
+    },
+    wbdt: {
+      type: Boolean,
+      default: false,
+    },
+    wbsf: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

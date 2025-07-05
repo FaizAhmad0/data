@@ -136,6 +136,29 @@ const AdminUserTable = ({ allusers }) => {
     }
   };
 
+  const handleUpdateFlag = async (userId, flagKey) => {
+    try {
+      await axios.put(`${backendUrl}/admin/${userId}/update-flag`, {
+        key: flagKey,
+        value: true,
+      });
+      message.success(`${flagKey.toUpperCase()} updated!`);
+      window.location.reload();
+    } catch (error) {
+      message.error("Failed to update. Please try again.");
+    }
+  };
+
+  const handleToggleFlag = async (id, key, value) => {
+    try {
+      await axios.put(`${backendUrl}/admin/${id}/update-flag`, { key, value });
+      message.success(`${key} updated to ${value}`);
+      window.location.reload();
+    } catch (err) {
+      message.error("Update failed");
+    }
+  };
+
   const columns = [
     {
       title: "UID",
@@ -261,6 +284,103 @@ const AdminUserTable = ({ allusers }) => {
       title: "Enrolled By",
       dataIndex: "enrolledBy",
     },
+    {
+      title: "AZDT",
+      dataIndex: "azdt",
+      render: (value, record) => (
+        <div className="flex items-center gap-2">
+          {value ? (
+            <Tag
+              color="green"
+              onClick={() => handleToggleFlag(record._id, "azdt", false)}
+              style={{ cursor: "pointer" }}
+            >
+              Done
+            </Tag>
+          ) : (
+            <Button
+              size="small"
+              onClick={() => handleToggleFlag(record._id, "azdt", true)}
+            >
+              Mark Done
+            </Button>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "AZSF",
+      dataIndex: "azsf",
+      render: (value, record) => (
+        <div className="flex items-center gap-2">
+          {value ? (
+            <Tag
+              color="green"
+              onClick={() => handleToggleFlag(record._id, "azsf", false)}
+              style={{ cursor: "pointer" }}
+            >
+              Done
+            </Tag>
+          ) : (
+            <Button
+              size="small"
+              onClick={() => handleToggleFlag(record._id, "azsf", true)}
+            >
+              Mark Done
+            </Button>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "WBDT",
+      dataIndex: "wbdt",
+      render: (value, record) => (
+        <div className="flex items-center gap-2">
+          {value ? (
+            <Tag
+              color="green"
+              onClick={() => handleToggleFlag(record._id, "wbdt", false)}
+              style={{ cursor: "pointer" }}
+            >
+              Done
+            </Tag>
+          ) : (
+            <Button
+              size="small"
+              onClick={() => handleToggleFlag(record._id, "wbdt", true)}
+            >
+              Mark Done
+            </Button>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "WBSF",
+      dataIndex: "wbsf",
+      render: (value, record) => (
+        <div className="flex items-center gap-2">
+          {value ? (
+            <Tag
+              color="green"
+              onClick={() => handleToggleFlag(record._id, "wbsf", false)}
+              style={{ cursor: "pointer" }}
+            >
+              Done
+            </Tag>
+          ) : (
+            <Button
+              size="small"
+              onClick={() => handleToggleFlag(record._id, "wbsf", true)}
+            >
+              Mark Done
+            </Button>
+          )}
+        </div>
+      ),
+    },
+
     {
       title: "Action",
       render: (_, user) => (

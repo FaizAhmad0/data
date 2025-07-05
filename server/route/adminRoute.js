@@ -12,6 +12,7 @@ const getAllSupervisor = require("../controller/getAllSupervisor");
 const createNewSupervisor = require("../controller/createNewSupervisor");
 const updateSupervisor = require("../controller/updateSupervisor");
 const deleteSupervisor = require("../controller/deleteSupervisor");
+const updateDtSfForUser = require("../controller/updateDtSfForUser");
 
 const router = express.Router();
 
@@ -27,6 +28,7 @@ router.post("/create-user", createNewUser);
 router.post("/create-manager", createNewManager);
 router.post("/create-supervisor", createNewSupervisor);
 router.put("/assign-manager/:id", assignManager);
+router.put("/:id/update-flag", updateDtSfForUser);
 router.post("/bulk-upload", bulkUpload);
 
 module.exports = router;
