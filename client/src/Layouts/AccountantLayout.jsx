@@ -86,7 +86,7 @@ const AccountantLayout = ({ children }) => {
 
       {/* Content Area */}
       <div className="flex-1 flex flex-col bg-gray-100 overflow-auto">
-        {/* Navbar */}
+
         <Navbar toggleSidebar={toggleSidebar} />
 
         {/* Main Content */}

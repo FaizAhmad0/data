@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Button, Modal, Form, Input, Tag, message } from "antd";
+import { Table, Button, Modal, Form, Input, Tag, message, Switch } from "antd";
 import axios from "axios";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -31,7 +31,7 @@ const AcUserTable = ({ allusers }) => {
         `${documentType.toUpperCase()} link uploaded successfully`
       );
       setIsModalOpen(false);
-      window.location.reload();
+      window.location.reload(); // You can replace with better state updates
     } catch (error) {
       message.error("Failed to upload. Try again.");
     } finally {
@@ -60,6 +60,19 @@ const AcUserTable = ({ allusers }) => {
     );
   };
 
+  const handleToggleChange = async (userId, type, value) => {
+    try {
+      await axios.post(`${backendUrl}/accountant/toggle-doc-status/${userId}`, {
+        type, // "gstDone" or "legalityDone"
+        value, // true or false
+      });
+      message.success(`${type} updated`);
+      window.location.reload(); // You can also optimistically update state if needed
+    } catch (error) {
+      message.error(`Failed to update ${type}`);
+    }
+  };
+
   const columns = [
     {
       title: "Name",
@@ -84,15 +97,60 @@ const AcUserTable = ({ allusers }) => {
       dataIndex: "enrollmentIdAmazon",
     },
     {
+      title: "A. Manager",
+      dataIndex: "amazonManager",
+    },
+    {
       title: "W. Enrollment",
       dataIndex: "enrollmentIdWebsite",
+    },
+    {
+      title: "W. Manager",
+      dataIndex: "websiteManager",
     },
     {
       title: "E. Enrollment",
       dataIndex: "enrollmentIdEtsy",
     },
     {
-      title: "GST Link",
+      title: "E. Manager",
+      dataIndex: "etsyManager",
+    },
+    {
+      title: "GST",
+      render: (_, record) => (
+        <Switch
+          checked={record.gstDone}
+          onChange={(checked) =>
+            handleToggleChange(record._id, "gstDone", checked)
+          }
+        />
+      ),
+    },
+    {
+      title: "Legality",
+      render: (_, record) => (
+        <Switch
+          checked={record.legalityDone}
+          onChange={(checked) =>
+            handleToggleChange(record._id, "legalityDone", checked)
+          }
+        />
+      ),
+    },
+    {
+      title: "Bill Provided",
+      render: (_, record) => (
+        <Switch
+          checked={record.billProvided}
+          onChange={(checked) =>
+            handleToggleChange(record._id, "billProvided", checked)
+          }
+        />
+      ),
+    },
+    {
+      title: "Bill Link",
       render: (_, record) => renderLinkOrButton(record, "gst"),
     },
     {
@@ -109,6 +167,7 @@ const AcUserTable = ({ allusers }) => {
         dataSource={allusers}
         rowKey="_id"
         scroll={{ x: "max-content" }}
+        pagination={{ pageSize: 50, hideOnSinglePage: true }}
       />
 
       <Modal

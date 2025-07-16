@@ -35,6 +35,18 @@ const userSchema = new Schema(
     batchWebsite: { type: String },
     batchEtsy: { type: String },
     enrolledBy: { type: String },
+    gstDone: {
+      type: Boolean,
+      default: false,
+    },
+    legalityDone: {
+      type: Boolean,
+      default: false,
+    },
+    billProvided: {
+      type: Boolean,
+      default: false,
+    },
     gstLink: {
       type: String,
       default: "",

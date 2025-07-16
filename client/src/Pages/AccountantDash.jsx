@@ -103,7 +103,7 @@ const AccountantDash = () => {
 
   return (
     <AccountantLayout>
-      <div className="bg-gray-50 min-h-screen p-4">
+      <div className="bg-gray-50 min-h-screen">
         {error && (
           <Alert
             message="Error"
