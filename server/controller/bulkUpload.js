@@ -49,11 +49,15 @@
 //       const enrollmentPrefix = String(enrollment).slice(0, 2).toUpperCase();
 
 //       const existingUser = await User.findOne({ primaryContact });
-//       console.log(manager);
-//       const tl = await User.findOne({ name:manager });
-//       // console.log(tl);
+
+//       // Check if manager exists
+//       const tl = await User.findOne({ name: manager });
 //       if (!tl) {
-//         return res.status(500).json({ message: `${manager} is not defined` });
+//         skippedUsers.push({
+//           primaryContact,
+//           reason: `${manager} is not defined as a manager.`,
+//         });
+//         continue;
 //       }
 
 //       if (existingUser) {
@@ -95,7 +99,7 @@
 //           });
 //         }
 
-//         continue; // skip to next user
+//         continue;
 //       }
 
 //       // Create new user
@@ -157,8 +161,8 @@
 //   }
 // };
 
-
 const User = require("../model/userModel");
+const XLSX = require("xlsx");
 
 module.exports = async (req, res) => {
   try {
@@ -168,7 +172,6 @@ module.exports = async (req, res) => {
       return res.status(400).json({ message: "Invalid or empty data." });
     }
 
-    // Get last UID from database
     const lastUser = await User.findOne().sort({ uid: -1 }).limit(1);
     let currentUid = lastUser?.uid || 0;
 
@@ -198,7 +201,7 @@ module.exports = async (req, res) => {
         !manager
       ) {
         skippedUsers.push({
-          primaryContact,
+          enrollment,
           reason: "Missing required fields.",
         });
         continue;
@@ -210,11 +213,10 @@ module.exports = async (req, res) => {
 
       const existingUser = await User.findOne({ primaryContact });
 
-      // Check if manager exists
       const tl = await User.findOne({ name: manager });
       if (!tl) {
         skippedUsers.push({
-          primaryContact,
+          enrollment,
           reason: `${manager} is not defined as a manager.`,
         });
         continue;
@@ -254,7 +256,7 @@ module.exports = async (req, res) => {
           updatedUsers.push(existingUser);
         } else {
           skippedUsers.push({
-            primaryContact,
+            enrollment,
             reason: "Enrollment already exists for this contact.",
           });
         }
@@ -262,7 +264,7 @@ module.exports = async (req, res) => {
         continue;
       }
 
-      // Create new user
+      // Create new user (even if email already exists)
       currentUid += 1;
       const password =
         `UID${currentUid}@${namePrefix}@${mobileSuffix}`.toUpperCase();
@@ -303,6 +305,29 @@ module.exports = async (req, res) => {
       createdUsers.push(newUser);
     }
 
+    // Export skipped users to Excel if any
+    if (skippedUsers.length > 0) {
+      const worksheet = XLSX.utils.json_to_sheet(skippedUsers);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Skipped Users");
+
+      const buffer = XLSX.write(workbook, {
+        type: "buffer",
+        bookType: "xlsx",
+      });
+
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=skipped_users.xlsx"
+      );
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      return res.status(200).send(buffer);
+    }
+
+    // If no skipped users, send JSON
     res.status(200).json({
       message: "Bulk user processing completed.",
       created: createdUsers.length,
@@ -310,7 +335,6 @@ module.exports = async (req, res) => {
       skipped: skippedUsers.length,
       createdUsers,
       updatedUsers,
-      skippedUsers,
     });
   } catch (error) {
     console.error("Error in bulk user upload:", error);

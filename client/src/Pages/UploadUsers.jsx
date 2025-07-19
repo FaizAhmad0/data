@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Button, message } from "antd";
+import React, { useRef, useState } from "react";
+import { Button, message, Spin } from "antd";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import axios from "axios";
@@ -9,9 +9,19 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const UploadUsers = () => {
   const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
+  };
+
+  const downloadBlob = (blob, filename) => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleFileChange = async (e) => {
@@ -29,10 +39,10 @@ const UploadUsers = () => {
     }
   };
 
-  // Handle Excel file (XLSX or XLS)
   const handleExcelFile = (file) => {
     const reader = new FileReader();
     reader.onload = async (event) => {
+      setUploading(true);
       const data = new Uint8Array(event.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
@@ -43,7 +53,7 @@ const UploadUsers = () => {
         if (row.date) {
           const parsedDate = dayjs(row.date);
           if (parsedDate.isValid()) {
-            row.date = parsedDate.format("YYYY-MM-DD"); // ← Updated format
+            row.date = parsedDate.format("YYYY-MM-DD");
           }
         }
         return row;
@@ -52,45 +62,43 @@ const UploadUsers = () => {
       try {
         const response = await axios.post(
           `${backendUrl}/admin/bulk-upload`,
-          formattedData
+          formattedData,
+          {
+            responseType: "blob",
+          }
         );
-        const {
-          message: successMessage,
-          created,
-          updated,
-          skipped,
-          skippedUsers,
-        } = response.data;
 
-        if (skipped > 0 && skippedUsers?.length) {
-          const reasons = skippedUsers
-            .map(
-              (user, index) =>
-                `${index + 1}. ${user.primaryContact}: ${user.reason}`
-            )
-            .join("\n");
+        const contentType = response.headers["content-type"];
 
-          message.warning(
-            `Skipped ${skipped} users:\n${reasons}`
-          );
+        if (
+          contentType ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ) {
+          message.warning("Some users were skipped. Downloading report...");
+          downloadBlob(response.data, "skipped_users.xlsx");
         } else {
+          const text = await response.data.text();
+          const json = JSON.parse(text);
+          const { message: successMessage, created, updated } = json;
           message.success(
-            successMessage || "Excel data uploaded successfully."
+            successMessage ||
+              `Upload complete. Created: ${created}, Updated: ${updated}`
           );
         }
-
       } catch (error) {
         console.error("Upload failed:", error);
         message.error(error?.response?.data?.message || error.message);
+      } finally {
+        setUploading(false);
       }
     };
     reader.readAsArrayBuffer(file);
   };
 
-  // Handle CSV file
   const handleCsvFile = (file) => {
     const reader = new FileReader();
     reader.onload = async (event) => {
+      setUploading(true);
       const csvData = event.target.result;
 
       Papa.parse(csvData, {
@@ -101,7 +109,7 @@ const UploadUsers = () => {
             if (row.date) {
               const parsedDate = dayjs(row.date, ["DD-MM-YYYY", "YYYY-MM-DD"]);
               if (parsedDate.isValid()) {
-                row.date = parsedDate.format("YYYY-MM-DD"); // ← Updated format
+                row.date = parsedDate.format("YYYY-MM-DD");
               }
             }
             return row;
@@ -110,12 +118,34 @@ const UploadUsers = () => {
           try {
             const response = await axios.post(
               `${backendUrl}/admin/bulk-upload`,
-              formattedData
+              formattedData,
+              {
+                responseType: "blob",
+              }
             );
-            message.success("CSV data uploaded successfully!");
+
+            const contentType = response.headers["content-type"];
+
+            if (
+              contentType ===
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ) {
+              message.warning("Some users were skipped. Downloading report...");
+              downloadBlob(response.data, "skipped_users.xlsx");
+            } else {
+              const text = await response.data.text();
+              const json = JSON.parse(text);
+              const { message: successMessage, created, updated } = json;
+              message.success(
+                successMessage ||
+                  `Upload complete. Created: ${created}, Updated: ${updated}`
+              );
+            }
           } catch (error) {
             console.error("Upload failed:", error);
             message.error("Failed to upload CSV data.");
+          } finally {
+            setUploading(false);
           }
         },
         header: true,
@@ -125,18 +155,29 @@ const UploadUsers = () => {
   };
 
   return (
-    <div>
-      <Button className="mb-4" type="primary" onClick={handleButtonClick}>
-        Upload Excel/CSV
-      </Button>
-      <input
-        type="file"
-        ref={fileInputRef}
-        style={{ display: "none" }}
-        accept=".xlsx, .xls, .csv"
-        onChange={handleFileChange}
-      />
-    </div>
+    <Spin
+      spinning={uploading}
+      tip="Please wait while processing bulk upload..."
+    >
+      <div>
+        <Button
+          className="mb-4"
+          type="primary"
+          onClick={handleButtonClick}
+          disabled={uploading}
+        >
+          Upload Excel/CSV
+        </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          accept=".xlsx, .xls, .csv"
+          onChange={handleFileChange}
+          disabled={uploading}
+        />
+      </div>
+    </Spin>
   );
 };
 

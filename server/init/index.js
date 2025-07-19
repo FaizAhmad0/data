@@ -18,26 +18,24 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-const updateManagerToAccountant = async () => {
+const updateTLUsersToManager = async () => {
   try {
-    const user = await User.find({
-      uid: 28,
-    });
-    if (!user) {
-      console.log("Manager with the given email not found.");
-      return;
-    }
+    const result = await User.updateMany(
+      { name: { $regex: /^TL/, $options: "i" } }, // name starts with 'TL', case-insensitive
+      { $set: { role: "manager" } }
+    );
 
-    user.role = "accountant";
-    await user.save();
-    console.log("Role updated to accountant for:", user.email);
+    console.log(`Updated ${result.modifiedCount} users to role 'manager'.`);
   } catch (error) {
-    console.error("Error updating role:", error);
+    console.error("Error updating roles:", error);
   }
 };
 
-// Call the function
-updateManagerToAccountant();
+updateTLUsersToManager();
+
+
+
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

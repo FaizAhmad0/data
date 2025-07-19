@@ -197,13 +197,17 @@ const AdminUserTable = ({ allusers }) => {
       ),
     },
     {
+      title: "E. ID AMAZON",
+      dataIndex: "enrollmentIdAmazon",
+    },
+    {
       title: "Date (AMAZON)",
       dataIndex: "dateAmazon",
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
-      title: "E. ID AMAZON",
-      dataIndex: "enrollmentIdAmazon",
+      title: "E. ID WEBSITE",
+      dataIndex: "enrollmentIdWebsite",
     },
     {
       title: "Date (WEBSITE)",
@@ -219,10 +223,7 @@ const AdminUserTable = ({ allusers }) => {
       dataIndex: "dateEtsy",
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
-    {
-      title: "E. ID WEBSITE",
-      dataIndex: "enrollmentIdWebsite",
-    },
+
     {
       title: "Batch (WEBSITE)",
       dataIndex: "batchWebsite",

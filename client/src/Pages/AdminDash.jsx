@@ -96,6 +96,7 @@ const AdminDash = () => {
         ? [
             user.enrollment,
             user.mobile,
+            user.email,
             user.primaryContact,
             user.enrollmentIdAmazon,
             user.enrollmentIdWebsite,
@@ -180,7 +181,7 @@ const AdminDash = () => {
           />
           <input
             type="text"
-            placeholder="Search by enrollment, mobile, or contact ID"
+            placeholder="Search by enrollment, email, mobile, or contact ID"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             className="border px-4 py-2 rounded w-full max-w-md"
