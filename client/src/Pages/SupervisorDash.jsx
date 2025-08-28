@@ -9,7 +9,7 @@ import {
   parseISO,
   isWithinInterval,
 } from "date-fns";
-import SupervisorLayout from "../Layouts/SupervisorLayout"; // Use a specific layout if needed
+import SupervisorLayout from "../Layouts/SupervisorLayout";
 import UserTable from "./UserTable";
 import AdminUserTable from "./AdminUserTable";
 import UploadUsers from "./UploadUsers";
@@ -24,9 +24,10 @@ const SupervisorDash = () => {
 
   const [filter, setFilter] = useState("all");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
+  const [enrollmentSearch, setEnrollmentSearch] = useState(""); // 🔹 new state
 
   const fetchUsers = async () => {
-    const supervisor = localStorage.getItem("name"); // Supervisor name
+    const supervisor = localStorage.getItem("name");
     if (!supervisor) {
       setError("Supervisor not found. Please login again.");
       setLoading(false);
@@ -35,7 +36,6 @@ const SupervisorDash = () => {
 
     try {
       const response = await axios.get(`${backendUrl}/admin/get-all-user`);
-
       const sortedUsers = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
@@ -56,29 +56,49 @@ const SupervisorDash = () => {
       if (!user.createdAt) return false;
       const date = parseISO(user.createdAt);
 
+      // 🔹 filter by date
+      let dateMatch = true;
       switch (filter) {
         case "today":
-          return isToday(date);
+          dateMatch = isToday(date);
+          break;
         case "week":
-          return isThisWeek(date, { weekStartsOn: 1 });
+          dateMatch = isThisWeek(date, { weekStartsOn: 1 });
+          break;
         case "month":
-          return isThisMonth(date);
+          dateMatch = isThisMonth(date);
+          break;
         case "year":
-          return isThisYear(date);
+          dateMatch = isThisYear(date);
+          break;
         case "custom":
           if (customRange.start && customRange.end) {
-            return isWithinInterval(date, {
+            dateMatch = isWithinInterval(date, {
               start: new Date(customRange.start),
               end: new Date(customRange.end),
             });
+          } else {
+            dateMatch = false;
           }
-          return false;
-        case "all":
+          break;
         default:
-          return true;
+          dateMatch = true;
       }
+
+      // 🔹 filter by enrollment IDs
+      const enrollmentMatch = enrollmentSearch
+        ? [
+            user.enrollmentIdAmazon,
+            user.enrollmentIdWebsite,
+            user.enrollmentIdEtsy,
+          ].some((id) =>
+            id?.toLowerCase().includes(enrollmentSearch.toLowerCase())
+          )
+        : true;
+
+      return dateMatch && enrollmentMatch;
     });
-  }, [users, filter, customRange]);
+  }, [users, filter, customRange, enrollmentSearch]);
 
   return (
     <SupervisorLayout>
@@ -149,14 +169,24 @@ const SupervisorDash = () => {
           </div>
         )}
 
+        {/* 🔹 Enrollment Filter Input */}
+        <div className="flex justify-center mb-4">
+          <input
+            type="text"
+            placeholder="Search by Enrollment ID, Amazon, Website, Etsy"
+            value={enrollmentSearch}
+            onChange={(e) => setEnrollmentSearch(e.target.value.trim())}
+            className="border rounded px-3 py-1 w-1/2"
+          />
+        </div>
+
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Spin size="large" />
           </div>
         ) : (
           <div className="overflow-x-auto">
-            {/* <AdminUse allusers={filteredUsers} /> */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 mb-4">
               <UploadUsers />
               <DownloadSampleButton />
             </div>
