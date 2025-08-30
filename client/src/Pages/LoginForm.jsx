@@ -10,7 +10,6 @@ import { jwtDecode } from "jwt-decode";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-
 const LoginForm = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
@@ -20,12 +19,11 @@ const LoginForm = () => {
 
   useEffect(() => {
     AOS.init();
-  }, []);
-
-  useEffect(() => {
     const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
     if (!token) {
+      localStorage.removeItem("role");
       navigate("/");
       message.success("Session expired or not logged in. Please log in again!");
       return;
@@ -37,13 +35,44 @@ const LoginForm = () => {
 
       if (decoded.exp < currentTime) {
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
         navigate("/");
         message.success(
           "Session expired or not logged in. Please log in again!"
         );
+        return;
+      }
+
+      // ✅ Navigate based on role
+      if (role) {
+        switch (role) {
+          case "user":
+            navigate("/userdash");
+            break;
+          case "manager":
+            navigate("/managerdash");
+            break;
+          case "admin":
+            navigate("/admindash");
+            break;
+          case "dispatch":
+            navigate("/dispatch-dash");
+            break;
+          case "supervisor":
+            navigate("/supervisordash");
+            break;
+          case "accountant":
+            navigate("/accountantdash");
+            break;
+          default:
+            navigate("/");
+        }
+      } else {
+        navigate("/");
       }
     } catch (error) {
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
       navigate("/");
       message.success("Session expired or not logged in. Please log in again!");
     }
