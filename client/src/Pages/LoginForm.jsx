@@ -19,6 +19,33 @@ const LoginForm = () => {
     AOS.init();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/");
+      message.success("Session expired or not logged in. Please log in again!");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+
+      if (decoded.exp < currentTime) {
+        localStorage.removeItem("token");
+        navigate("/");
+        message.success(
+          "Session expired or not logged in. Please log in again!"
+        );
+      }
+    } catch (error) {
+      localStorage.removeItem("token");
+      navigate("/");
+      message.success("Session expired or not logged in. Please log in again!");
+    }
+  }, [navigate]);
+
   const onFinish = async (values) => {
     try {
       const res = await axios.post(`${backendUrl}/login`, values);
