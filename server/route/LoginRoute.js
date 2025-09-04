@@ -11,8 +11,14 @@ router.post("/", async (req, res) => {
   const uid = rawUid.replace(/^UID/, "");
 
   const user = await User.findOne({ uid });
-  if (!user || password !== user.password) {
-    return res.status(401).json({ error: "Invalid credentials" });
+  if (!user) {
+    return res.status(401).json({ error: "User not found with this uid" });
+  }
+  const trimmedInputPassword = password.trim();
+  const trimmedStoredPassword = user.password.trim();
+
+  if (trimmedInputPassword !== trimmedStoredPassword) {
+    return res.status(401).json({ error: "Incorrect password" });
   }
 
   if (user.role === "user") {
