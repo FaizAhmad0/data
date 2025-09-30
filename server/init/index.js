@@ -9,7 +9,7 @@ const PORT = 8500;
 // Connect to MongoDB
 mongoose
   .connect(
-    "mongodb+srv://saumic:saumic123@cluster0.pxceo4x.mongodb.net/crm?retryWrites=true&w=majority&appName=Cluster0",
+    "mongodb+srv://saumic:saumicNewData@cluster0.4b4er14.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -31,7 +31,45 @@ const updateTLUsersToManager = async () => {
   }
 };
 
-updateTLUsersToManager();
+// updateTLUsersToManager();
+// Function to bulk update Etsy Manager for given UIDs
+async function updateEtsyManagers() {
+  try {
+    const uids = [
+      3751, 3750, 3744, 3743, 3742, 3741, 3740, 3739, 3738, 3737, 3736, 3735,
+      3734, 3733, 3732, 3731, 3730, 3729, 3728, 3727, 3726, 3725, 3724, 3723,
+      3708, 3173, 2957, 2773, 2597, 2469, 2329, 2217, 2191, 1863, 1558, 1493,
+      664, 531, 432, 380, 375, 338, 181,
+    ];
+
+    // Step 1: Find which UIDs actually exist
+    const existingUsers = await User.find(
+      { uid: { $in: uids } },
+      { uid: 1 }
+    ).lean();
+    const existingUIDs = existingUsers.map((u) => u.uid);
+
+    console.log("Existing UIDs:", existingUIDs);
+    console.log(
+      "Missing UIDs:",
+      uids.filter((id) => !existingUIDs.includes(id))
+    );
+
+    // Step 2: Perform the update
+    const result = await User.updateMany(
+      { uid: { $in: uids } },
+      { $set: { etsyManager: "ETSY TL" } }
+    );
+
+    console.log(
+      `Matched: ${result.matchedCount}, Modified: ${result.modifiedCount}`
+    );
+  } catch (error) {
+    console.error("Error updating Etsy managers:", error);
+  }
+}
+
+updateEtsyManagers();
 
 
 

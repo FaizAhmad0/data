@@ -78,6 +78,15 @@ const UserTable = ({ allusers }) => {
       dataIndex: "enrollmentIdWebsite",
     },
     {
+      title: "Date (ETSY)",
+      dataIndex: "dateEtsy",
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
+    },
+    {
+      title: "E. ID ETSY",
+      dataIndex: "enrollmentIdEtsy",
+    },
+    {
       title: "Batch (WEBSITE)",
       dataIndex: "batchWebsite",
     },
