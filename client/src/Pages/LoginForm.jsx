@@ -166,10 +166,7 @@ const LoginForm = () => {
           onFinish={requiresOtp ? onOtpSubmit : onFinish}
         >
           <div className="login-logo">
-            <img
-              src="https://support.saumiccraft.com/wp-content/uploads/2023/05/logo-saumic-new.png"
-              alt="Logo"
-            />
+            <img src="./logo.png" alt="Logo" />
           </div>
           {!requiresOtp ? (
             <>

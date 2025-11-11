@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import { Spin, Alert } from "antd";
+import { Spin, Alert, Input } from "antd";
 import {
   isToday,
   isThisWeek,
@@ -18,9 +18,9 @@ const ManagerDash = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [filter, setFilter] = useState("all");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchUsers = async () => {
     const manager = localStorage.getItem("name"); // e.g., "TL1"
@@ -52,34 +52,54 @@ const ManagerDash = () => {
     fetchUsers();
   }, []);
 
+  // 🔍 Combine search + date filters
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       if (!user.createdAt) return false;
+
       const date = parseISO(user.createdAt);
 
+      // ✅ Date filter
+      let dateMatch = false;
       switch (filter) {
         case "today":
-          return isToday(date);
+          dateMatch = isToday(date);
+          break;
         case "week":
-          return isThisWeek(date, { weekStartsOn: 1 });
+          dateMatch = isThisWeek(date, { weekStartsOn: 1 });
+          break;
         case "month":
-          return isThisMonth(date);
+          dateMatch = isThisMonth(date);
+          break;
         case "year":
-          return isThisYear(date);
+          dateMatch = isThisYear(date);
+          break;
         case "custom":
           if (customRange.start && customRange.end) {
-            return isWithinInterval(date, {
+            dateMatch = isWithinInterval(date, {
               start: new Date(customRange.start),
               end: new Date(customRange.end),
             });
           }
-          return false;
-        case "all":
+          break;
         default:
-          return true;
+          dateMatch = true;
       }
+
+      // ✅ Search filter (case-insensitive)
+      const term = searchTerm.trim().toLowerCase();
+      const searchMatch =
+        !term ||
+        user.name?.toLowerCase().includes(term) ||
+        user.email?.toLowerCase().includes(term) ||
+        user.primaryContact?.toLowerCase().includes(term) ||
+        user.enrollmentIdAmazon?.toLowerCase().includes(term) ||
+        user.enrollmentIdWebsite?.toLowerCase().includes(term) ||
+        user.enrollmentIdEtsy?.toLowerCase().includes(term);
+
+      return dateMatch && searchMatch;
     });
-  }, [users, filter, customRange]);
+  }, [users, filter, customRange, searchTerm]);
 
   return (
     <ManagerLayout>
@@ -90,6 +110,7 @@ const ManagerDash = () => {
           </h1>
         </div>
       </div>
+
       <div className="bg-gray-50 min-h-screen p-4">
         {error && (
           <Alert
@@ -101,7 +122,18 @@ const ManagerDash = () => {
           />
         )}
 
-        {/* Filter Buttons */}
+        {/* 🔍 Search Bar */}
+        <div className="flex justify-center mb-4">
+          <Input
+            placeholder="Search by name, email, contact, or enrollment ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full max-w-lg shadow-sm"
+            allowClear
+          />
+        </div>
+
+        {/* 🗓 Filter Buttons */}
         <div className="flex flex-wrap gap-3 justify-center mb-4">
           {["all", "today", "week", "month", "year", "custom"].map((f) => (
             <button
@@ -128,7 +160,7 @@ const ManagerDash = () => {
           ))}
         </div>
 
-        {/* Custom Date Range Filter */}
+        {/* 📅 Custom Date Range */}
         {filter === "custom" && (
           <div className="flex justify-center gap-4 mb-4">
             <input
@@ -150,6 +182,7 @@ const ManagerDash = () => {
           </div>
         )}
 
+        {/* 📊 Table */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Spin size="large" />
