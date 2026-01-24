@@ -60,22 +60,22 @@ const AdminUserTable = ({ allusers }) => {
         break;
       case "amazon_website":
         filtered = allusers.filter(
-          (user) => user.enrollmentIdAmazon && user.enrollmentIdWebsite
+          (user) => user.enrollmentIdAmazon && user.enrollmentIdWebsite,
         );
         break;
       case "amazon_etsy":
         filtered = allusers.filter(
-          (user) => user.enrollmentIdAmazon && user.enrollmentIdEtsy
+          (user) => user.enrollmentIdAmazon && user.enrollmentIdEtsy,
         );
         break;
       case "amazon_only":
         filtered = allusers.filter(
-          (user) => user.enrollmentIdAmazon && !user.enrollmentIdWebsite
+          (user) => user.enrollmentIdAmazon && !user.enrollmentIdWebsite,
         );
         break;
       case "website_only":
         filtered = allusers.filter(
-          (user) => user.enrollmentIdWebsite && !user.enrollmentIdAmazon
+          (user) => user.enrollmentIdWebsite && !user.enrollmentIdAmazon,
         );
         break;
       default:
@@ -89,16 +89,16 @@ const AdminUserTable = ({ allusers }) => {
   const websiteCount = allusers.filter((u) => u.enrollmentIdWebsite).length;
   const etsyCount = allusers.filter((u) => u.enrollmentIdEtsy).length;
   const amazonWebsiteCount = allusers.filter(
-    (u) => u.enrollmentIdAmazon && u.enrollmentIdWebsite
+    (u) => u.enrollmentIdAmazon && u.enrollmentIdWebsite,
   ).length;
   const amazonEtsyCount = allusers.filter(
-    (u) => u.enrollmentIdAmazon && u.enrollmentIdEtsy
+    (u) => u.enrollmentIdAmazon && u.enrollmentIdEtsy,
   ).length;
   const amazonOnlyCount = allusers.filter(
-    (u) => u.enrollmentIdAmazon && !u.enrollmentIdWebsite
+    (u) => u.enrollmentIdAmazon && !u.enrollmentIdWebsite,
   ).length;
   const websiteOnlyCount = allusers.filter(
-    (u) => u.enrollmentIdWebsite && !u.enrollmentIdAmazon
+    (u) => u.enrollmentIdWebsite && !u.enrollmentIdAmazon,
   ).length;
 
   const handleDelete = async (userId) => {
@@ -122,7 +122,7 @@ const AdminUserTable = ({ allusers }) => {
         {
           type: managerType,
           name: managerName,
-        }
+        },
       );
 
       message.success("Manager assigned successfully!");
@@ -411,6 +411,7 @@ const AdminUserTable = ({ allusers }) => {
     { label: "UID", key: "uid" },
     { label: "Name", key: "name" },
     { label: "Email", key: "email" },
+    { label: "GST", key: "gst" },
     { label: "Primary Contact", key: "primaryContact" },
     { label: "Password", key: "password" },
     { label: "Enrollment ID Amazon", key: "enrollmentIdAmazon" },

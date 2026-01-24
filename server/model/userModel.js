@@ -9,6 +9,9 @@ const userSchema = new Schema(
 
     email: { type: String, required: true },
     password: { type: String },
+    gst: {
+      type: String,
+    },
     role: {
       type: String,
       enum: ["user", "manager", "admin", "supervisor", "accountant"],
@@ -72,7 +75,7 @@ const userSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("User", userSchema);
